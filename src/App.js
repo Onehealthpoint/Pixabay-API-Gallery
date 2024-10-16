@@ -22,6 +22,12 @@ function App() {
   },[term]);
 
 
+  const clearSearchbarAndSetTerm = (text) => {
+    setTerm(text);
+    document.getElementById('search').value = text;
+  }
+
+
   return (
     <div className="container mx-auto">
       <Searchbar searchText={(text) => setTerm(text)}/>
@@ -31,7 +37,7 @@ function App() {
       {isLoading ? <Loader/> : 
         <div className="grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-y-4 md:gap-x-4 lg:grid-cols-3 lg:gap-y-8 lg:gap-x-8 justify-items-center">
           {images.map(image => (
-            <ImageCard key={image.id} image={image}/>
+            <ImageCard key={image.id} image={image} searchTag={(text) => clearSearchbarAndSetTerm(text)}/>
           ))}
         </div>
       }
