@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import ImageCard from './components/ImageCard'; 
+import Searchbar from './components/Searchbar';
+import SearchFailLoader from './components/SearchFailLoader';
+import Loader from './components/Loader';
+import process from 'process';
 
-function App() {
+function App() { 
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [term, setTerm] = useState('');
+
+  useEffect(() => {
+    fetch(`https://pixabay.com/api/?key=${process.env.REACT_APP_PIXABAY_API_KEY}&q=${term}&image_type=photo&pretty=true`)
+    .then(res => res.json())
+    .then(data => {
+      setImages(data.hits);
+      setIsLoading(false);
+      console.log(data.hits);
+    })
+    .catch(err => console.log(err));
+  },[term]);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <div className="container mx-auto">
+      <Searchbar searchText={(text) => setTerm(text)}/>
+      
+      {!isLoading && images.length === 0 && <SearchFailLoader/>}
+      
+      {isLoading ? <Loader/> : 
+        <div className="grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-y-4 md:gap-x-4 lg:grid-cols-3 lg:gap-y-8 lg:gap-x-8 justify-items-center">
+          {images.map(image => (
+            <ImageCard key={image.id} image={image}/>
+          ))}
+        </div>
+      }
+    </div>   
+); 
+} 
 
 export default App;
